@@ -12,6 +12,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -45,6 +46,7 @@ export default function RootLayout({
               {children}
             </TRPCReactProvider>
           </ThemeProvider>
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
