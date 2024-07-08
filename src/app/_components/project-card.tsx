@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Project } from "@/types";
+import { type Project } from "@/types";
 import { Calendar, User } from "lucide-react";
 
 export default function ProjectCard({
