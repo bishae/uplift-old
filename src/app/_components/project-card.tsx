@@ -15,7 +15,7 @@ export default function ProjectCard({
   client,
 }: Project) {
   return (
-    <Card>
+    <Card className="transition-all hover:cursor-pointer hover:opacity-70">
       <CardHeader>
         <CardTitle className="w-64 truncate text-sm font-medium">
           {name}
