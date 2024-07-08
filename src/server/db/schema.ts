@@ -3,7 +3,9 @@
 
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   index,
+  integer,
   pgEnum,
   pgTableCreator,
   serial,
@@ -37,6 +39,19 @@ export const posts = createTable(
   }),
 );
 
+export const clients = createTable("clients", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 256 }),
+  contactInfo: text("contact_info"),
+  owner: varchar("owner", { length: 256 }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
 export const statusEnum = pgEnum("status", [
   "active",
   "completed",
@@ -49,6 +64,22 @@ export const projects = createTable("projects", {
   name: varchar("name", { length: 256 }),
   description: text("description"),
   status: statusEnum("status").default("active"),
+  clientId: integer("client_id").references(() => clients.id),
+  owner: varchar("owner", { length: 256 }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+export const tasks = createTable("tasks", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 256 }),
+  description: text("description"),
+  completed: boolean("completed").default(false),
+  projectId: integer("project_id").references(() => projects.id),
   owner: varchar("owner", { length: 256 }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
