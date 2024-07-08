@@ -33,6 +33,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
 
 export default function CreateProjectForm() {
   const form = useForm<z.infer<typeof projectSchema>>({
@@ -54,11 +55,17 @@ export default function CreateProjectForm() {
   ) => {
     create.mutate(data);
     form.reset();
+    toast({
+      title: "Success",
+      description: `New project has been added and is currently ${data.status} project`,
+    });
   };
 
   return (
     <Dialog>
-      <DialogTrigger>Project</DialogTrigger>
+      <DialogTrigger asChild>
+        <Button>New Project</Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Project</DialogTitle>
@@ -90,14 +97,17 @@ export default function CreateProjectForm() {
                 <FormItem>
                   <FormLabel>Project Status</FormLabel>
                   <FormControl>
-                    <Select>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Active" />
                       </SelectTrigger>
-                      <SelectContent {...field}>
+                      <SelectContent>
                         {statusEnum.enumValues.map((e) => (
                           <SelectItem key={e} value={e}>
-                            {e}
+                            {e.replace("_", " ")}
                           </SelectItem>
                         ))}
                       </SelectContent>

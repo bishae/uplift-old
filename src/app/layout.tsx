@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Uplift",
@@ -28,6 +29,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TRPCReactProvider>{children}</TRPCReactProvider>
+            <Toaster />
           </ThemeProvider>
           <Analytics />
         </body>

@@ -7,15 +7,22 @@ import {
 } from "@/components/ui/card";
 import { type Project } from "@/types";
 import { Calendar, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ProjectCard({
+  id,
   name,
   description,
   due,
   client,
 }: Project) {
+  const router = useRouter();
+
   return (
-    <Card className="transition-all hover:cursor-pointer hover:opacity-70">
+    <Card
+      className="transition-all hover:cursor-pointer hover:opacity-70"
+      onClick={() => router.push(`/projects/${id}`)}
+    >
       <CardHeader>
         <CardTitle className="w-64 truncate text-sm font-medium">
           {name}

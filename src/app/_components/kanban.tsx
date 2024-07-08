@@ -26,6 +26,7 @@ export default function Kanban() {
                 .map((e) => (
                   <ProjectCard
                     key={e.id}
+                    id={e.id}
                     name={e.name ?? ""}
                     description={e.description}
                     due={new Date("10-6-2024")}
@@ -47,6 +48,7 @@ export default function Kanban() {
                 .map((e) => (
                   <ProjectCard
                     key={e.id}
+                    id={e.id}
                     name={e.name ?? ""}
                     description={e.description}
                     due={new Date("10-6-2024")}
@@ -68,6 +70,7 @@ export default function Kanban() {
                 .map((e) => (
                   <ProjectCard
                     key={e.id}
+                    id={e.id}
                     name={e.name ?? ""}
                     description={e.description}
                     due={new Date("10-6-2024")}

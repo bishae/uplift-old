@@ -10,6 +10,7 @@ export type SiteConfig = {
 };
 
 interface Project {
+  id: number;
   name: string;
   description?: string | null;
   due: Date;
