@@ -3,8 +3,6 @@
  * @see https://v0.dev/t/UrcKDFu8aDz
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import Link from "next/link";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -269,7 +267,7 @@ export default function Kanban() {
   );
 }
 
-function CalendarIcon(props) {
+function CalendarIcon(props: any) {
   return (
     <svg
       {...props}
@@ -291,7 +289,7 @@ function CalendarIcon(props) {
   );
 }
 
-function UsersIcon(props) {
+function UsersIcon(props: any) {
   return (
     <svg
       {...props}

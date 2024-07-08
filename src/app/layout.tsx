@@ -7,7 +7,6 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
-import { UserNav } from "./_components/user-nav";
 
 export const metadata: Metadata = {
   title: "Uplift",
