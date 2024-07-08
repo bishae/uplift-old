@@ -13,6 +13,7 @@ import {
 } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
   title: "Uplift",
@@ -35,6 +36,7 @@ export default function RootLayout({
           >
             <TRPCReactProvider>
               <header>
+                <ThemeToggle />
                 <SignedOut>
                   <SignInButton />
                 </SignedOut>
