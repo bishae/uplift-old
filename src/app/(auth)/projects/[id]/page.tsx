@@ -3,11 +3,20 @@
 import CreateTaskForm from "@/app/_components/create-task-form";
 import ProjectCard from "@/app/_components/project-card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { api } from "@/trpc/react";
 import { Calendar, User } from "lucide-react";
+import Link from "next/link";
 
 export default function Project({ params }: { params: { id: string } }) {
   const tasks = api.task.all.useQuery({
@@ -19,7 +28,22 @@ export default function Project({ params }: { params: { id: string } }) {
   return (
     <>
       <div className="flex items-center justify-between space-y-2 px-8 py-4">
-        <h2 className="text-3xl tracking-tight">Gig: {project.data?.name}</h2>
+        {/* <h2 className="text-3xl tracking-tight">Gig: {project.data?.name}</h2> */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbLink asChild>
+              <Link href="/dashboard">Dashboard</Link>
+            </BreadcrumbLink>
+            <BreadcrumbSeparator />
+            {/* <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Projects</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator /> */}
+            <BreadcrumbItem>
+              <BreadcrumbPage>Gig</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <div className="flex items-center space-x-2">
           <CreateTaskForm projectId={parseInt(params.id)} />
         </div>
