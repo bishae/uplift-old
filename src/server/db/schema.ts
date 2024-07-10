@@ -74,11 +74,17 @@ export const projects = createTable("projects", {
   ),
 });
 
+export const taskStatusEnum = pgEnum("task_status", [
+  "todo",
+  "in_progress",
+  "done",
+]);
+
 export const tasks = createTable("tasks", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 256 }),
+  summery: varchar("name", { length: 256 }),
   description: text("description"),
-  completed: boolean("completed").default(false),
+  status: taskStatusEnum("status").default("todo"),
   projectId: integer("project_id").references(() => projects.id),
   owner: varchar("owner", { length: 256 }),
   createdAt: timestamp("created_at", { withTimezone: true })
