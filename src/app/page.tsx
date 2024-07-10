@@ -14,7 +14,7 @@ export default async function Home() {
         Follow along on LinkedIn
       </Link>
       <h1 className="font-heading text-xl sm:text-5xl md:text-6xl lg:text-7xl">
-        Take Control with UPLIFT.
+        Cost Control with UPLIFT.
       </h1>
       <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
         All-in-one project and cost management platform, built for freelancers
