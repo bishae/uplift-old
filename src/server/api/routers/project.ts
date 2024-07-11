@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import {
-  createProjectSchema,
+  insertProjectSchema,
   projects,
   updateProjectSchema,
 } from "@/server/db/schema";
@@ -32,7 +32,7 @@ export const projectRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(createProjectSchema)
+    .input(insertProjectSchema)
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .insert(projects)

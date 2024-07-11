@@ -67,12 +67,16 @@ export const statusEnum = pgEnum("status", [
 
 export const projects = createTable("projects", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 256 }),
-  description: text("description"),
-  status: statusEnum("status").default("active"),
-  budget: numeric("budget", { precision: 10, scale: 2 }),
-  clientId: integer("client_id").references(() => clients.id),
-  owner: varchar("owner", { length: 256 }),
+  name: varchar("name", { length: 256 }).notNull(),
+  description: text("description").notNull().default(""),
+  status: statusEnum("status").notNull().default("active"),
+  budget: numeric("budget", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0.00"),
+  clientId: integer("client_id")
+    .references(() => clients.id)
+    .notNull(),
+  owner: varchar("owner", { length: 256 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -159,18 +163,5 @@ export const ProjectsToExpensesRelations = relations(
   }),
 );
 
-export const insertProjectSchema = createInsertSchema(projects, {
-  id: (schema) => schema.id,
-});
-
-export const createProjectSchema = insertProjectSchema.pick({
-  name: true,
-  status: true,
-  budget: true,
-});
-
-export const updateProjectSchema = insertProjectSchema.pick({
-  id: true,
-  name: true,
-  status: true,
-});
+export const insertProjectSchema = createInsertSchema(projects);
+export const updateProjectSchema = createSelectSchema(projects);

@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createProjectSchema, statusEnum } from "@/server/db/schema";
+import { insertProjectSchema, statusEnum } from "@/server/db/schema";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type z } from "zod";
@@ -35,12 +35,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
 export default function CreateProjectForm() {
-  const form = useForm<z.infer<typeof createProjectSchema>>({
-    resolver: zodResolver(createProjectSchema),
+  const form = useForm<z.infer<typeof insertProjectSchema>>({
+    resolver: zodResolver(insertProjectSchema),
     defaultValues: {
       name: "",
       status: "active",
-      budget: 0,
+      budget: "0.00",
     },
   });
 
@@ -50,7 +50,7 @@ export default function CreateProjectForm() {
     onSuccess: () => utils.project.all.invalidate(),
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof createProjectSchema>> = async (
+  const onSubmit: SubmitHandler<z.infer<typeof insertProjectSchema>> = async (
     data,
   ) => {
     create.mutate(data);
