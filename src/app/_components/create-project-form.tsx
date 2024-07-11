@@ -16,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { insertProjectSchema, statusEnum } from "@/server/db/schema";
+import { statusEnum } from "@/server/db/schema";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type z } from "zod";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -34,13 +34,23 @@ import { api } from "@/trpc/react";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
+const formSchema = z.object({
+  name: z.string(),
+  status: z.enum(statusEnum.enumValues),
+  budget: z.string(),
+  clientId: z.string(),
+});
+
 export default function CreateProjectForm() {
-  const form = useForm<z.infer<typeof insertProjectSchema>>({
-    resolver: zodResolver(insertProjectSchema),
+  const clients = api.customer.all.useQuery();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       status: "active",
       budget: "0.00",
+      clientId: "",
     },
   });
 
@@ -50,9 +60,7 @@ export default function CreateProjectForm() {
     onSuccess: () => utils.project.all.invalidate(),
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof insertProjectSchema>> = async (
-    data,
-  ) => {
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (data) => {
     create.mutate(data);
     form.reset();
     toast({
@@ -67,6 +75,9 @@ export default function CreateProjectForm() {
         <Button>New Project</Button>
       </DialogTrigger>
       <DialogContent>
+        {process.env.NODE_ENV === "development" && (
+          <>{JSON.stringify(form.formState.errors)}</>
+        )}
         <DialogHeader>
           <DialogTitle>Project</DialogTitle>
           <DialogDescription>This will add a new project.</DialogDescription>
@@ -132,6 +143,34 @@ export default function CreateProjectForm() {
                   </FormControl>
                   <FormDescription>
                     This is the display name of the project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="clientId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Project Status</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Client" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clients.data?.map((e) => (
+                          <SelectItem key={e.id} value={e.id.toString()}>
+                            {e.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormDescription>
+                    Set it for the current status of the project.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

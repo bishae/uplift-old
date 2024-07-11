@@ -42,7 +42,9 @@ export default function ProjectCard({ project }: Props) {
         </div>
         <div className="flex items-center gap-2 text-sm">
           <User className="h-4 w-4" />
-          {/* <span className="text-muted-foreground">Client: {client}</span> */}
+          <span className="text-muted-foreground">
+            {/* Client: {project.client.name} */}
+          </span>
         </div>
       </CardContent>
     </Card>

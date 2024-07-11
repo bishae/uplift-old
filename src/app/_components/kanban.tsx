@@ -3,8 +3,19 @@
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/trpc/react";
 import ProjectCard from "./project-card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { project } from "@/lib/validation";
+import { Calendar, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Kanban() {
+  const router = useRouter();
   const projects = api.project.all.useQuery({ limit: 10 });
 
   return (
@@ -38,7 +49,39 @@ export default function Kanban() {
             <div className="grid gap-4">
               {projects.data
                 ?.filter((e) => e.status === "on_hold")
-                .map((e) => <ProjectCard key={e.id} project={e} />)}
+                .map((e) => (
+                  <Card
+                    key={e.id}
+                    className="transition-all hover:cursor-pointer hover:opacity-70"
+                    onClick={() => router.push(`/projects/${e.id}`)}
+                  >
+                    <CardHeader>
+                      <CardTitle className="w-64 truncate text-sm font-medium">
+                        {e.name}
+                      </CardTitle>
+                      {project.description && (
+                        <CardDescription className="w-64 truncate">
+                          {project.description}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="grid gap-2">
+                      {/* <div className="text-sm font-medium">{title}</div> */}
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-muted-foreground">
+                          {/* {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)} */}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="h-4 w-4" />
+                        <span className="text-muted-foreground">
+                          Client: {e.client?.name}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           </div>
           <div className="rounded-lg bg-background p-4">
@@ -51,7 +94,39 @@ export default function Kanban() {
             <div className="grid gap-4">
               {projects.data
                 ?.filter((e) => e.status === "active")
-                .map((e) => <ProjectCard key={e.id} project={e} />)}
+                .map((e) => (
+                  <Card
+                    key={e.id}
+                    className="transition-all hover:cursor-pointer hover:opacity-70"
+                    onClick={() => router.push(`/projects/${e.id}`)}
+                  >
+                    <CardHeader>
+                      <CardTitle className="w-64 truncate text-sm font-medium">
+                        {e.name}
+                      </CardTitle>
+                      {project.description && (
+                        <CardDescription className="w-64 truncate">
+                          {project.description}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="grid gap-2">
+                      {/* <div className="text-sm font-medium">{title}</div> */}
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-muted-foreground">
+                          {/* {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)} */}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="h-4 w-4" />
+                        <span className="text-muted-foreground">
+                          Client: {e.client?.name}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           </div>
           <div className="rounded-lg bg-background p-4">
@@ -64,7 +139,39 @@ export default function Kanban() {
             <div className="grid gap-4">
               {projects.data
                 ?.filter((e) => e.status === "completed")
-                .map((e) => <ProjectCard key={e.id} project={e} />)}
+                .map((e) => (
+                  <Card
+                    key={e.id}
+                    className="transition-all hover:cursor-pointer hover:opacity-70"
+                    onClick={() => router.push(`/projects/${e.id}`)}
+                  >
+                    <CardHeader>
+                      <CardTitle className="w-64 truncate text-sm font-medium">
+                        {e.name}
+                      </CardTitle>
+                      {project.description && (
+                        <CardDescription className="w-64 truncate">
+                          {project.description}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="grid gap-2">
+                      {/* <div className="text-sm font-medium">{title}</div> */}
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-muted-foreground">
+                          {/* {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)} */}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="h-4 w-4" />
+                        <span className="text-muted-foreground">
+                          Client: {e.client?.name}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           </div>
         </div>

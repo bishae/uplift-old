@@ -85,7 +85,6 @@ export default function TaskUpdateForm({ id, _task, children }: Props) {
             This will update a selected task.
           </DialogDescription>
         </DialogHeader>
-        {JSON.stringify(form.formState.errors)}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField

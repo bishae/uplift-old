@@ -24,6 +24,7 @@ export default function Project({ params }: { params: { id: string } }) {
     projectId: parseInt(params.id),
     limit: 10,
   });
+
   const project = api.project.one.useQuery({ id: parseInt(params.id) });
 
   if (tasks.isLoading) return <p>Loading...</p>;

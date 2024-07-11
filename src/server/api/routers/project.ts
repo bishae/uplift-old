@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import {
+  expenses,
   insertProjectSchema,
   projects,
+  statusEnum,
   updateProjectSchema,
 } from "@/server/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -12,11 +14,11 @@ export const projectRouter = createTRPCRouter({
   all: protectedProcedure
     .input(z.object({ limit: z.number() }))
     .query(async ({ ctx, input }) => {
-      return await ctx.db
-        .select()
-        .from(projects)
-        .where(eq(projects.owner, ctx.session.userId))
-        .limit(input.limit);
+      return await ctx.db.query.projects.findMany({
+        where: eq(projects.owner, ctx.session.userId),
+        limit: input.limit,
+        with: { client: true },
+      });
     }),
 
   one: protectedProcedure
@@ -27,16 +29,27 @@ export const projectRouter = createTRPCRouter({
           eq(projects.id, input.id),
           eq(projects.owner, ctx.session.userId),
         ),
-        with: { client: true },
+        with: { client: true, expenses: true },
       });
     }),
 
   create: protectedProcedure
-    .input(insertProjectSchema)
+    .input(
+      z.object({
+        name: z.string(),
+        status: z.enum(statusEnum.enumValues),
+        budget: z.string(),
+        clientId: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db
-        .insert(projects)
-        .values({ ...input, owner: ctx.session.userId });
+      await ctx.db.insert(projects).values({
+        name: input.name,
+        status: input.status,
+        budget: input.budget,
+        clientId: parseInt(input.clientId),
+        owner: ctx.session.userId,
+      });
     }),
 
   update: protectedProcedure
@@ -57,11 +70,5 @@ export const projectRouter = createTRPCRouter({
             eq(projects.owner, ctx.session.userId),
           ),
         );
-    }),
-
-  remainingBudget: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .query(({ ctx, input }) => {
-      //
     }),
 });
