@@ -16,10 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { statusEnum } from "@/server/db/schema";
+import { createProjectSchema, statusEnum } from "@/server/db/schema";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { projectSchema } from "@/lib/inputSchema";
 import { type z } from "zod";
 import {
   Form,
@@ -36,11 +35,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
 export default function CreateProjectForm() {
-  const form = useForm<z.infer<typeof projectSchema>>({
-    resolver: zodResolver(projectSchema),
+  const form = useForm<z.infer<typeof createProjectSchema>>({
+    resolver: zodResolver(createProjectSchema),
     defaultValues: {
       name: "",
       status: "active",
+      budget: 0,
     },
   });
 
@@ -50,7 +50,7 @@ export default function CreateProjectForm() {
     onSuccess: () => utils.project.all.invalidate(),
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof projectSchema>> = async (
+  const onSubmit: SubmitHandler<z.infer<typeof createProjectSchema>> = async (
     data,
   ) => {
     create.mutate(data);
@@ -99,7 +99,7 @@ export default function CreateProjectForm() {
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      defaultValue={field.value ?? "active"}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Active" />
@@ -115,6 +115,23 @@ export default function CreateProjectForm() {
                   </FormControl>
                   <FormDescription>
                     Set it for the current status of the project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="budget"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Budget</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="budget" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is the display name of the project.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

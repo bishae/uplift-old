@@ -1,8 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { projects } from "@/server/db/schema";
+import {
+  createProjectSchema,
+  projects,
+  updateProjectSchema,
+} from "@/server/db/schema";
 import { and, eq } from "drizzle-orm";
-import { projectSchema } from "@/lib/inputSchema";
 import { TRPCError } from "@trpc/server";
 
 export const projectRouter = createTRPCRouter({
@@ -29,7 +32,7 @@ export const projectRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(projectSchema)
+    .input(createProjectSchema)
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .insert(projects)
@@ -37,7 +40,7 @@ export const projectRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(projectSchema)
+    .input(updateProjectSchema)
     .mutation(async ({ ctx, input }) => {
       if (!input.id)
         throw new TRPCError({
@@ -54,5 +57,11 @@ export const projectRouter = createTRPCRouter({
             eq(projects.owner, ctx.session.userId),
           ),
         );
+    }),
+
+  remainingBudget: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(({ ctx, input }) => {
+      //
     }),
 });

@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { api } from "@/trpc/react";
 import { Calendar, User } from "lucide-react";
 import Link from "next/link";
@@ -86,11 +87,25 @@ export default function Project({ params }: { params: { id: string } }) {
               <CardContent className="grid gap-4">
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Total Budget</span>
-                    <span>$50,000</span>
+                    {project.data?.budget ? (
+                      <>
+                        <span className="text-muted-foreground">
+                          Total Budget
+                        </span>
+                        <span>
+                          {Intl.NumberFormat("en-US", {
+                            currency: "USD",
+                            style: "currency",
+                          }).format(parseFloat(project.data?.budget))}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">No Budget</span>
+                    )}
                   </div>
-                  <Progress value={60} aria-label="60% of budget used" />
+                  {/* <Progress value={60} aria-label="60% of budget used" /> */}
                 </div>
+                <Separator />
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Expenses</span>

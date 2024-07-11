@@ -5,14 +5,16 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  numeric,
   pgEnum,
   pgTableCreator,
+  primaryKey,
   serial,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -68,6 +70,7 @@ export const projects = createTable("projects", {
   name: varchar("name", { length: 256 }),
   description: text("description"),
   status: statusEnum("status").default("active"),
+  budget: numeric("budget", { precision: 10, scale: 2 }),
   clientId: integer("client_id").references(() => clients.id),
   owner: varchar("owner", { length: 256 }),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -78,11 +81,12 @@ export const projects = createTable("projects", {
   ),
 });
 
-export const projectsRelations = relations(projects, ({ one }) => ({
+export const projectsRelations = relations(projects, ({ one, many }) => ({
   client: one(clients, {
     fields: [projects.clientId],
     references: [clients.id],
   }),
+  projectsRelations: many(projectsToExpenses),
 }));
 
 export const selectProjectSchema = createSelectSchema(projects);
@@ -109,3 +113,64 @@ export const tasks = createTable("tasks", {
 });
 
 export const selectTaskSchema = createSelectSchema(tasks);
+
+export const expenses = createTable("expenses", {
+  id: serial("id").primaryKey(),
+  note: varchar("note", { length: 256 }),
+  amount: numeric("amount", { precision: 2 }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+export const expensesRelations = relations(expenses, ({ many }) => ({
+  projectsRelations: many(projectsToExpenses),
+}));
+
+export const projectsToExpenses = createTable(
+  "projects_to_expenses",
+  {
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id),
+    expenseId: integer("expense_id")
+      .notNull()
+      .references(() => expenses.id),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.projectId, t.expenseId] }),
+  }),
+);
+
+export const ProjectsToExpensesRelations = relations(
+  projectsToExpenses,
+  ({ one }) => ({
+    project: one(projects, {
+      fields: [projectsToExpenses.projectId],
+      references: [projects.id],
+    }),
+    expense: one(expenses, {
+      fields: [projectsToExpenses.expenseId],
+      references: [expenses.id],
+    }),
+  }),
+);
+
+export const insertProjectSchema = createInsertSchema(projects, {
+  id: (schema) => schema.id,
+});
+
+export const createProjectSchema = insertProjectSchema.pick({
+  name: true,
+  status: true,
+  budget: true,
+});
+
+export const updateProjectSchema = insertProjectSchema.pick({
+  id: true,
+  name: true,
+  status: true,
+});
