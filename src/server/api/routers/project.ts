@@ -24,6 +24,7 @@ export const projectRouter = createTRPCRouter({
           eq(projects.id, input.id),
           eq(projects.owner, ctx.session.userId),
         ),
+        with: { client: true },
       });
     }),
 

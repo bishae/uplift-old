@@ -1,7 +1,7 @@
 "use client";
 
 import CreateTaskForm from "@/app/_components/create-task-form";
-import ProjectCard from "@/app/_components/project-card";
+import TaskCard from "@/app/_components/task-card";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -24,6 +24,10 @@ export default function Project({ params }: { params: { id: string } }) {
     limit: 10,
   });
   const project = api.project.one.useQuery({ id: parseInt(params.id) });
+
+  if (tasks.isLoading) return <p>Loading...</p>;
+
+  if (!tasks.data) return <p>No data...</p>;
 
   return (
     <>
@@ -70,7 +74,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4" />
                   <span className="text-muted-foreground">
-                    Client: John Doe
+                    Client: {project.data?.client?.name ?? "N/A"}
                   </span>
                 </div>
               </CardContent>
@@ -116,16 +120,9 @@ export default function Project({ params }: { params: { id: string } }) {
               </div>
               <div className="grid gap-4">
                 {tasks.data
-                  ?.filter((e) => e.status === "todo")
+                  .filter((e) => e.status === "todo")
                   .map((e) => (
-                    <ProjectCard
-                      key={e.id}
-                      id={e.id}
-                      name={e.summery ?? ""}
-                      description={e.description}
-                      due={new Date("10-6-2024")}
-                      client="John Doe"
-                    />
+                    <TaskCard key={e.id} task={e} />
                   ))}
               </div>
             </div>
@@ -138,16 +135,9 @@ export default function Project({ params }: { params: { id: string } }) {
               </div>
               <div className="grid gap-4">
                 {tasks.data
-                  ?.filter((e) => e.status === "in_progress")
+                  .filter((e) => e.status === "in_progress")
                   .map((e) => (
-                    <ProjectCard
-                      key={e.id}
-                      id={e.id}
-                      name={e.summery ?? ""}
-                      description={e.description}
-                      due={new Date("10-6-2024")}
-                      client="John Doe"
-                    />
+                    <TaskCard key={e.id} task={e} />
                   ))}
               </div>
             </div>
@@ -160,16 +150,9 @@ export default function Project({ params }: { params: { id: string } }) {
               </div>
               <div className="grid gap-4">
                 {tasks.data
-                  ?.filter((e) => e.status === "done")
+                  .filter((e) => e.status === "done")
                   .map((e) => (
-                    <ProjectCard
-                      key={e.id}
-                      id={e.id}
-                      name={e.summery ?? ""}
-                      description={e.description}
-                      due={new Date("10-6-2024")}
-                      client="John Doe"
-                    />
+                    <TaskCard key={e.id} task={e} />
                   ))}
               </div>
             </div>

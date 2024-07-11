@@ -9,7 +9,13 @@ export const project = z.object({
 });
 
 export const task = z.object({
+  id: z.number().optional(),
   summery: z.string(),
   status: z.enum(taskStatusEnum.enumValues),
   projectId: z.number(),
+});
+
+export const client = z.object({
+  name: z.string(),
+  contactInfo: z.string(),
 });

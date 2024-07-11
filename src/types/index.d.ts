@@ -8,11 +8,3 @@ export type SiteConfig = {
     github: string;
   };
 };
-
-interface Project {
-  id: number;
-  name: string;
-  description?: string | null;
-  due: Date;
-  client: string;
-}

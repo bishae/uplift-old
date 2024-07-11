@@ -3,7 +3,6 @@
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/trpc/react";
 import ProjectCard from "./project-card";
-import ProjectDetailedCard from "./project-detailed-card";
 
 export default function Kanban() {
   const projects = api.project.all.useQuery({ limit: 10 });
@@ -23,16 +22,7 @@ export default function Kanban() {
             <div className="grid gap-4">
               {projects.data
                 ?.filter((e) => e.status === "cancelled")
-                .map((e) => (
-                  <ProjectCard
-                    key={e.id}
-                    id={e.id}
-                    name={e.name ?? ""}
-                    description={e.description}
-                    due={new Date("10-6-2024")}
-                    client="John Doe"
-                  />
-                ))}
+                .map((e) => <ProjectCard key={e.id} project={e} />)}
             </div>
           </div>
         </div>
@@ -48,16 +38,7 @@ export default function Kanban() {
             <div className="grid gap-4">
               {projects.data
                 ?.filter((e) => e.status === "on_hold")
-                .map((e) => (
-                  <ProjectCard
-                    key={e.id}
-                    id={e.id}
-                    name={e.name ?? ""}
-                    description={e.description}
-                    due={new Date("10-6-2024")}
-                    client="John Doe"
-                  />
-                ))}
+                .map((e) => <ProjectCard key={e.id} project={e} />)}
             </div>
           </div>
           <div className="rounded-lg bg-background p-4">
@@ -70,16 +51,7 @@ export default function Kanban() {
             <div className="grid gap-4">
               {projects.data
                 ?.filter((e) => e.status === "active")
-                .map((e) => (
-                  <ProjectCard
-                    key={e.id}
-                    id={e.id}
-                    name={e.name ?? ""}
-                    description={e.description}
-                    due={new Date("10-6-2024")}
-                    client="John Doe"
-                  />
-                ))}
+                .map((e) => <ProjectCard key={e.id} project={e} />)}
             </div>
           </div>
           <div className="rounded-lg bg-background p-4">
@@ -92,16 +64,7 @@ export default function Kanban() {
             <div className="grid gap-4">
               {projects.data
                 ?.filter((e) => e.status === "completed")
-                .map((e) => (
-                  <ProjectCard
-                    key={e.id}
-                    id={e.id}
-                    name={e.name ?? ""}
-                    description={e.description}
-                    due={new Date("10-6-2024")}
-                    client="John Doe"
-                  />
-                ))}
+                .map((e) => <ProjectCard key={e.id} project={e} />)}
             </div>
           </div>
         </div>

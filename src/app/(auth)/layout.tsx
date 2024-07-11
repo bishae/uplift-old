@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { ClerkLoaded } from "@clerk/nextjs";
 import { UserNav } from "../_components/user-nav";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function RootLayout({
   children,
@@ -20,6 +21,7 @@ export default function RootLayout({
               </Link>
               <div className="ml-auto flex items-center space-x-4">
                 {/* <Search /> */}
+                <ThemeToggle />
                 <UserNav />
               </div>
             </div>

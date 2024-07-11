@@ -5,31 +5,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { type Project } from "@/types";
+import { type selectProjectSchema } from "@/server/db/schema";
 import { Calendar, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { type z } from "zod";
 
-export default function ProjectCard({
-  id,
-  name,
-  description,
-  due,
-  client,
-}: Project) {
+interface Props {
+  project: z.infer<typeof selectProjectSchema>;
+}
+
+export default function ProjectCard({ project }: Props) {
   const router = useRouter();
 
   return (
     <Card
       className="transition-all hover:cursor-pointer hover:opacity-70"
-      onClick={() => router.push(`/projects/${id}`)}
+      onClick={() => router.push(`/projects/${project.id}`)}
     >
       <CardHeader>
         <CardTitle className="w-64 truncate text-sm font-medium">
-          {name}
+          {project.name}
         </CardTitle>
-        {description && (
+        {project.description && (
           <CardDescription className="w-64 truncate">
-            {description}
+            {project.description}
           </CardDescription>
         )}
       </CardHeader>
@@ -38,12 +37,12 @@ export default function ProjectCard({
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="h-4 w-4" />
           <span className="text-muted-foreground">
-            {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)}
+            {/* {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)} */}
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <User className="h-4 w-4" />
-          <span className="text-muted-foreground">Client: {client}</span>
+          {/* <span className="text-muted-foreground">Client: {client}</span> */}
         </div>
       </CardContent>
     </Card>

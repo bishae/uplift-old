@@ -1,9 +1,8 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
-  boolean,
   index,
   integer,
   pgEnum,
@@ -13,6 +12,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -52,6 +52,10 @@ export const clients = createTable("clients", {
   ),
 });
 
+export const clientsRelations = relations(clients, ({ many }) => ({
+  projects: many(projects),
+}));
+
 export const statusEnum = pgEnum("status", [
   "active",
   "completed",
@@ -74,6 +78,15 @@ export const projects = createTable("projects", {
   ),
 });
 
+export const projectsRelations = relations(projects, ({ one }) => ({
+  client: one(clients, {
+    fields: [projects.clientId],
+    references: [clients.id],
+  }),
+}));
+
+export const selectProjectSchema = createSelectSchema(projects);
+
 export const taskStatusEnum = pgEnum("task_status", [
   "todo",
   "in_progress",
@@ -94,3 +107,5 @@ export const tasks = createTable("tasks", {
     () => new Date(),
   ),
 });
+
+export const selectTaskSchema = createSelectSchema(tasks);
