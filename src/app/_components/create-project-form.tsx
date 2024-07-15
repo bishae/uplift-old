@@ -72,7 +72,7 @@ export default function CreateProjectForm() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>New Project</Button>
+        <Button>Start a new project</Button>
       </DialogTrigger>
       <DialogContent>
         {process.env.NODE_ENV === "development" && (
