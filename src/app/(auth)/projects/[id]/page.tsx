@@ -99,7 +99,7 @@ export default function Project({ params }: { params: { id: string } }) {
                           {Intl.NumberFormat("en-US", {
                             currency: "USD",
                             style: "currency",
-                          }).format(parseFloat(expense.data?.budget!))}
+                          }).format(parseFloat(expense.data?.budget ?? "0.00"))}
                         </span>
                       </>
                     ) : (
@@ -116,7 +116,9 @@ export default function Project({ params }: { params: { id: string } }) {
                       {Intl.NumberFormat("en-US", {
                         currency: "USD",
                         style: "currency",
-                      }).format(parseFloat(expense.data?.total_expense!))}
+                      }).format(
+                        parseFloat(expense.data?.total_expense ?? "0.00"),
+                      )}
                     </span>
                   </div>
                   {/* <Progress value={60} aria-label="60% of budget used" /> */}
@@ -130,15 +132,15 @@ export default function Project({ params }: { params: { id: string } }) {
                         currency: "USD",
                         style: "currency",
                       }).format(
-                        parseFloat(expense.data?.budget!) -
-                          parseFloat(expense.data?.total_expense!),
+                        parseFloat(expense.data?.budget ?? "0.00") -
+                          parseFloat(expense.data?.total_expense ?? "0.00"),
                       )}
                     </span>
                   </div>
                   <Progress
                     value={
-                      (parseFloat(expense.data?.total_expense!) /
-                        parseFloat(expense.data?.budget!)) *
+                      (parseFloat(expense.data?.total_expense ?? "0.00") /
+                        parseFloat(expense.data?.budget ?? "0.00")) *
                       100
                     }
                     aria-label="40% of budget remaining"
