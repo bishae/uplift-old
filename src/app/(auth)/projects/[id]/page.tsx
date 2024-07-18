@@ -2,6 +2,7 @@
 
 import CreateTaskForm from "@/app/_components/create-task-form";
 import TaskCard from "@/app/_components/task-card";
+import CreateExpenseDialogForm from "@/components/create-expense-dialog-form";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -26,6 +27,7 @@ export default function Project({ params }: { params: { id: string } }) {
   });
 
   const project = api.project.one.useQuery({ id: parseInt(params.id) });
+  const expense = api.project.expense.useQuery({ id: parseInt(params.id) });
 
   if (tasks.isLoading) return <p>Loading...</p>;
 
@@ -97,7 +99,7 @@ export default function Project({ params }: { params: { id: string } }) {
                           {Intl.NumberFormat("en-US", {
                             currency: "USD",
                             style: "currency",
-                          }).format(parseFloat(project.data?.budget))}
+                          }).format(parseFloat(expense.data?.budget!))}
                         </span>
                       </>
                     ) : (
@@ -106,22 +108,43 @@ export default function Project({ params }: { params: { id: string } }) {
                   </div>
                   {/* <Progress value={60} aria-label="60% of budget used" /> */}
                 </div>
-                <Separator />
+
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Expenses</span>
-                    <span>$30,000</span>
+                    <span>
+                      {Intl.NumberFormat("en-US", {
+                        currency: "USD",
+                        style: "currency",
+                      }).format(parseFloat(expense.data?.total_expense!))}
+                    </span>
                   </div>
-                  <Progress value={60} aria-label="60% of budget used" />
+                  {/* <Progress value={60} aria-label="60% of budget used" /> */}
                 </div>
+                <Separator />
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Remaining</span>
-                    <span>$20,000</span>
+                    <span>
+                      {Intl.NumberFormat("en-US", {
+                        currency: "USD",
+                        style: "currency",
+                      }).format(
+                        parseFloat(expense.data?.budget!) -
+                          parseFloat(expense.data?.total_expense!),
+                      )}
+                    </span>
                   </div>
-                  <Progress value={40} aria-label="40% of budget remaining" />
+                  <Progress
+                    value={
+                      (parseFloat(expense.data?.total_expense!) /
+                        parseFloat(expense.data?.budget!)) *
+                      100
+                    }
+                    aria-label="40% of budget remaining"
+                  />
                 </div>
-                <Button size="sm">Add Expense</Button>
+                <CreateExpenseDialogForm projectId={parseInt(params.id)} />
               </CardContent>
             </Card>
           </div>

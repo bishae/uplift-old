@@ -2,12 +2,11 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import {
   expenses,
-  insertProjectSchema,
   projects,
   statusEnum,
   updateProjectSchema,
 } from "@/server/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sum } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const projectRouter = createTRPCRouter({
@@ -31,6 +30,21 @@ export const projectRouter = createTRPCRouter({
         ),
         with: { client: true, expenses: true },
       });
+    }),
+
+  expense: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const results = await ctx.db
+        .select({
+          budget: projects.budget,
+          total_expense: sum(expenses.amount),
+        })
+        .from(projects)
+        .leftJoin(expenses, eq(expenses.projectId, projects.id))
+        .groupBy(expenses.projectId, projects.budget)
+        .where(eq(expenses.projectId, input.id));
+      return results[0];
     }),
 
   create: protectedProcedure
