@@ -61,7 +61,7 @@ export default function CreateExpenseDialogForm({ projectId }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm">Add Expense</Button>
+        <Button size="sm">Extra Expense</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
