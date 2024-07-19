@@ -83,7 +83,7 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>New Task</Button>
+        <Button size="sm">New Task</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

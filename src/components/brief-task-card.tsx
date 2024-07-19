@@ -35,10 +35,6 @@ export default function BriefTaskCard({ task }: Props) {
               )}
             </span>
           </div>
-          {/* <div className="flex items-center gap-2 text-sm">
-            <User className="h-4 w-4" />
-            <span className="text-muted-foreground">Assigne: Jane Doe</span>
-          </div> */}
         </CardContent>
       </Card>
     </UpdateTaskUpdateDialogForm>

@@ -123,12 +123,12 @@ export default function UpdateTaskUpdateDialogForm({ task, children }: Props) {
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="capitalize">
                         <SelectValue placeholder="Active" />
                       </SelectTrigger>
                       <SelectContent>
                         {taskStatusEnum.enumValues.map((e) => (
-                          <SelectItem key={e} value={e}>
+                          <SelectItem key={e} value={e} className="capitalize">
                             {e.replace("_", " ")}
                           </SelectItem>
                         ))}
