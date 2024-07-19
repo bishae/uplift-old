@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const router = useRouter();
-  const projects = api.project.all.useQuery({ limit: 10 });
+  const projects = api.project.many.useQuery({ limit: 10 });
 
   return (
     <main>
@@ -90,11 +90,14 @@ export default function Dashboard() {
                         )}
                       </CardHeader>
                       <CardContent className="grid gap-2">
-                        {/* <div className="text-sm font-medium">{title}</div> */}
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="h-4 w-4" />
                           <span className="text-muted-foreground">
-                            {/* {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)} */}
+                            {e.dueDate
+                              ? Intl.DateTimeFormat("en-US", {
+                                  dateStyle: "long",
+                                }).format(new Date(e.dueDate))
+                              : "n/a"}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
@@ -135,11 +138,14 @@ export default function Dashboard() {
                         )}
                       </CardHeader>
                       <CardContent className="grid gap-2">
-                        {/* <div className="text-sm font-medium">{title}</div> */}
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="h-4 w-4" />
                           <span className="text-muted-foreground">
-                            {/* {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)} */}
+                            {e.dueDate
+                              ? Intl.DateTimeFormat("en-US", {
+                                  dateStyle: "long",
+                                }).format(new Date(e.dueDate))
+                              : "n/a"}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
@@ -183,11 +189,14 @@ export default function Dashboard() {
                         )}
                       </CardHeader>
                       <CardContent className="grid gap-2">
-                        {/* <div className="text-sm font-medium">{title}</div> */}
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="h-4 w-4" />
                           <span className="text-muted-foreground">
-                            {/* {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(due)} */}
+                            {e.dueDate
+                              ? Intl.DateTimeFormat("en-US", {
+                                  dateStyle: "long",
+                                }).format(new Date(e.dueDate))
+                              : "n/a"}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">

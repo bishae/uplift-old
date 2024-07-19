@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const taskRouter = createTRPCRouter({
-  all: protectedProcedure
+  many: protectedProcedure
     .input(z.object({ projectId: z.number(), limit: z.number() }))
     .query(async ({ ctx, input }) => {
       return await ctx.db.query.tasks.findMany({
@@ -17,7 +17,7 @@ export const taskRouter = createTRPCRouter({
       });
     }),
 
-  one: protectedProcedure
+  single: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       return await ctx.db.query.tasks.findFirst({
@@ -34,6 +34,7 @@ export const taskRouter = createTRPCRouter({
         summery: z.string(),
         description: z.string(),
         status: z.enum(taskStatusEnum.enumValues),
+        dueDate: z.date(),
         projectId: z.number(),
       }),
     )
@@ -42,6 +43,10 @@ export const taskRouter = createTRPCRouter({
         summery: input.summery,
         description: input.description,
         status: input.status,
+        dueDate: new Date(
+          input.dueDate.getTime() +
+            Math.abs(input.dueDate.getTimezoneOffset() * 60000),
+        ),
         projectId: input.projectId,
         createdBy: ctx.session.userId,
         updatedBy: ctx.session.userId,
@@ -55,6 +60,7 @@ export const taskRouter = createTRPCRouter({
         id: z.number(),
         summery: z.string(),
         status: z.enum(taskStatusEnum.enumValues),
+        dueDate: z.date(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -65,7 +71,14 @@ export const taskRouter = createTRPCRouter({
 
       await ctx.db
         .update(tasks)
-        .set({ summery: input.summery, status: input.status })
+        .set({
+          summery: input.summery,
+          status: input.status,
+          dueDate: new Date(
+            input.dueDate.getTime() +
+              Math.abs(input.dueDate.getTimezoneOffset() * 60000),
+          ),
+        })
         .where(
           and(
             eq(tasks.id, input.id),

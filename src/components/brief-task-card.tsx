@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Calendar, Text, User } from "lucide-react";
+import { Calendar, Text } from "lucide-react";
 import { type SelectTask } from "@/types";
 import UpdateTaskUpdateDialogForm from "./update-task-dialog-form";
 
@@ -31,14 +31,14 @@ export default function BriefTaskCard({ task }: Props) {
             <Calendar className="h-4 w-4" />
             <span className="text-muted-foreground">
               {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
-                new Date(),
+                new Date(task.dueDate),
               )}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
+          {/* <div className="flex items-center gap-2 text-sm">
             <User className="h-4 w-4" />
             <span className="text-muted-foreground">Assigne: Jane Doe</span>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </UpdateTaskUpdateDialogForm>

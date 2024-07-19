@@ -3,6 +3,7 @@
 
 import { relations, sql } from "drizzle-orm";
 import {
+  date,
   integer,
   numeric,
   pgEnum,
@@ -54,6 +55,7 @@ export const projects = createTable("projects", {
   description: text("description").default("").notNull(),
   status: projectStatusEnum("status").default("active").notNull(),
   budget: numeric("budget", { precision: 10, scale: 2 }).notNull(),
+  dueDate: date("due_date", { mode: "date" }).notNull(),
   customerId: integer("customer_id")
     .references(() => customers.id)
     .notNull(),
@@ -87,6 +89,7 @@ export const tasks = createTable("tasks", {
   summery: varchar("name", { length: 256 }).notNull(),
   description: text("description").notNull(),
   status: taskStatusEnum("status").notNull(),
+  dueDate: date("due_date", { mode: "date" }).notNull(),
   projectId: integer("project_id")
     .references(() => projects.id)
     .notNull(),

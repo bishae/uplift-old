@@ -33,6 +33,11 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "./ui/calendar";
 
 interface Props {
   projectId: number;
@@ -42,6 +47,7 @@ const formSchema = z.object({
   summery: z.string(),
   description: z.string(),
   status: z.enum(taskStatusEnum.enumValues),
+  dueDate: z.date(),
   projectId: z.number(),
 });
 
@@ -54,6 +60,7 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
       summery: "",
       description: "",
       status: "todo",
+      dueDate: new Date(),
       projectId: projectId,
     },
   });
@@ -61,7 +68,7 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
   const utils = api.useUtils();
 
   const create = api.task.create.useMutation({
-    onSuccess: () => utils.task.all.invalidate(),
+    onSuccess: () => utils.task.many.invalidate(),
   });
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
@@ -128,6 +135,45 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
                   <FormDescription>
                     Set it for the current status of the project.
                   </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem className="mt-[.6rem] flex flex-col">
+                  <FormLabel>Due Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>Due date of the project.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

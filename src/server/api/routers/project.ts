@@ -10,7 +10,7 @@ import { and, eq, getTableColumns, sum } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const projectRouter = createTRPCRouter({
-  all: protectedProcedure
+  many: protectedProcedure
     .input(z.object({ limit: z.number() }))
     .query(async ({ ctx, input }) => {
       return await ctx.db.query.projects.findMany({
@@ -20,7 +20,7 @@ export const projectRouter = createTRPCRouter({
       });
     }),
 
-  one: protectedProcedure
+  single: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       const project = (
@@ -42,6 +42,70 @@ export const projectRouter = createTRPCRouter({
       return project;
     }),
 
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        status: z.enum(projectStatusEnum.enumValues),
+        budget: z.string(),
+        dueDate: z.date(),
+        customerId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.insert(projects).values({
+        name: input.name,
+        status: input.status,
+        budget: input.budget,
+        dueDate: new Date(
+          input.dueDate.getTime() +
+            Math.abs(input.dueDate.getTimezoneOffset() * 60000),
+        ),
+        customerId: input.customerId,
+        createdBy: ctx.session.userId,
+        updatedBy: ctx.session.userId,
+        owner: ctx.session.orgId ?? ctx.session.userId,
+      });
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        status: z.enum(projectStatusEnum.enumValues),
+        budget: z.string(),
+        dueDate: z.date(),
+        customerId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!input.id)
+        throw new TRPCError({
+          message: "Entity id needs to be provided",
+          code: "BAD_REQUEST",
+        });
+
+      await ctx.db
+        .update(projects)
+        .set({
+          name: input.name,
+          status: input.status,
+          budget: input.budget,
+          dueDate: new Date(
+            input.dueDate.getTime() +
+              Math.abs(input.dueDate.getTimezoneOffset() * 60000),
+          ),
+          customerId: input.customerId,
+        })
+        .where(
+          and(
+            eq(projects.id, input.id),
+            eq(projects.owner, ctx.session.orgId ?? ctx.session.userId),
+          ),
+        );
+    }),
+
   expense: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -60,59 +124,5 @@ export const projectRouter = createTRPCRouter({
           ),
         );
       return results[0];
-    }),
-
-  create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        status: z.enum(projectStatusEnum.enumValues),
-        budget: z.string(),
-        customerId: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(projects).values({
-        name: input.name,
-        status: input.status,
-        budget: input.budget,
-        customerId: input.customerId,
-        createdBy: ctx.session.userId,
-        updatedBy: ctx.session.userId,
-        owner: ctx.session.orgId ?? ctx.session.userId,
-      });
-    }),
-
-  update: protectedProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-        status: z.enum(projectStatusEnum.enumValues),
-        budget: z.string(),
-        customerId: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (!input.id)
-        throw new TRPCError({
-          message: "Entity id needs to be provided",
-          code: "BAD_REQUEST",
-        });
-
-      await ctx.db
-        .update(projects)
-        .set({
-          name: input.name,
-          status: input.status,
-          budget: input.budget,
-          customerId: input.customerId,
-        })
-        .where(
-          and(
-            eq(projects.id, input.id),
-            eq(projects.owner, ctx.session.orgId ?? ctx.session.userId),
-          ),
-        );
     }),
 });

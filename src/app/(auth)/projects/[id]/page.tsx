@@ -21,12 +21,12 @@ import { Calendar, User } from "lucide-react";
 import Link from "next/link";
 
 export default function Project({ params }: { params: { id: string } }) {
-  const tasks = api.task.all.useQuery({
+  const tasks = api.task.many.useQuery({
     projectId: parseInt(params.id),
     limit: 10,
   });
 
-  const project = api.project.one.useQuery({ id: parseInt(params.id) });
+  const project = api.project.single.useQuery({ id: parseInt(params.id) });
 
   if (project.isLoading) return <p>Loading...</p>;
 
@@ -72,7 +72,12 @@ export default function Project({ params }: { params: { id: string } }) {
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4" />
                   <span className="text-muted-foreground">
-                    Due Date: June 30, 2023
+                    Due Date:{" "}
+                    {project.data.dueDate
+                      ? Intl.DateTimeFormat("en-US", {
+                          dateStyle: "long",
+                        }).format(new Date(project.data.dueDate))
+                      : "n/a"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
