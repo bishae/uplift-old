@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { statusEnum } from "@/server/db/schema";
+import { projectStatusEnum } from "@/server/db/schema";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,21 +36,23 @@ import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   name: z.string(),
-  status: z.enum(statusEnum.enumValues),
+  status: z.enum(projectStatusEnum.enumValues),
   budget: z.string(),
-  clientId: z.string(),
+  customerId: z.coerce.number(),
 });
 
-export default function CreateProjectForm() {
-  const clients = api.customer.all.useQuery();
+type FormInput = z.infer<typeof formSchema>;
 
-  const form = useForm<z.infer<typeof formSchema>>({
+export default function CreateProjectDialogForm() {
+  const customers = api.customer.all.useQuery();
+
+  const form = useForm<FormInput>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       status: "active",
-      budget: "0.00",
-      clientId: "",
+      budget: "",
+      customerId: 0,
     },
   });
 
@@ -60,7 +62,7 @@ export default function CreateProjectForm() {
     onSuccess: () => utils.project.all.invalidate(),
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (data) => {
+  const onSubmit: SubmitHandler<FormInput> = async (data) => {
     create.mutate(data);
     form.reset();
     toast({
@@ -110,14 +112,14 @@ export default function CreateProjectForm() {
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value ?? "active"}
+                      defaultValue={field.value}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Active" />
+                      <SelectTrigger className="capitalize">
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {statusEnum.enumValues.map((e) => (
-                          <SelectItem key={e} value={e}>
+                        {projectStatusEnum.enumValues.map((e) => (
+                          <SelectItem key={e} value={e} className="capitalize">
                             {e.replace("_", " ")}
                           </SelectItem>
                         ))}
@@ -151,17 +153,17 @@ export default function CreateProjectForm() {
 
             <FormField
               control={form.control}
-              name="clientId"
+              name="customerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Project Status</FormLabel>
+                  <FormLabel>Project Customer</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Client" />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {clients.data?.map((e) => (
+                        {customers.data?.map((e) => (
                           <SelectItem key={e.id} value={e.id.toString()}>
                             {e.name}
                           </SelectItem>

@@ -16,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type selectTaskSchema, taskStatusEnum } from "@/server/db/schema";
+import { taskStatusEnum } from "@/server/db/schema";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type z } from "zod";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -33,24 +33,33 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { task } from "@/lib/validation";
 import { type ReactNode } from "react";
+import { type SelectTask } from "@/types";
 
 interface Props {
-  id: number;
-  _task: z.infer<typeof selectTaskSchema>;
+  task: SelectTask;
   children: ReactNode;
 }
 
-export default function TaskUpdateForm({ id, _task, children }: Props) {
-  const taskQuery = api.task.one.useQuery({ id });
+const formSchema = z.object({
+  id: z.number(),
+  summery: z.string(),
+  status: z.enum(taskStatusEnum.enumValues),
+  projectId: z.number(),
+});
 
-  const form = useForm<z.infer<typeof task>>({
-    resolver: zodResolver(task),
+type FormInput = z.infer<typeof formSchema>;
+
+export default function UpdateTaskUpdateDialogForm({ task, children }: Props) {
+  const taskQuery = api.task.one.useQuery({ id: task.id });
+
+  const form = useForm<FormInput>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      summery: _task.summery ?? "",
-      status: _task.status ?? "todo",
-      projectId: _task.projectId ?? 0,
+      id: task.id,
+      summery: task.summery ?? "",
+      status: task.status ?? "todo",
+      projectId: task.projectId ?? 0,
     },
   });
 
@@ -60,8 +69,7 @@ export default function TaskUpdateForm({ id, _task, children }: Props) {
     onSuccess: () => utils.task.all.invalidate(),
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof task>> = async (data) => {
-    data.id = _task.id;
+  const onSubmit: SubmitHandler<FormInput> = async (data) => {
     create.mutate(data);
     form.reset();
     toast({

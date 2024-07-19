@@ -1,11 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import {
-  expenses,
-  projects,
-  statusEnum,
-  updateProjectSchema,
-} from "@/server/db/schema";
+import { expenses, projects, projectStatusEnum } from "@/server/db/schema";
 import { and, eq, sum } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -14,9 +9,9 @@ export const projectRouter = createTRPCRouter({
     .input(z.object({ limit: z.number() }))
     .query(async ({ ctx, input }) => {
       return await ctx.db.query.projects.findMany({
-        where: eq(projects.owner, ctx.session.userId),
+        where: eq(projects.owner, ctx.session.orgId ?? ctx.session.userId),
         limit: input.limit,
-        with: { client: true },
+        with: { customer: true },
       });
     }),
 
@@ -26,9 +21,9 @@ export const projectRouter = createTRPCRouter({
       return await ctx.db.query.projects.findFirst({
         where: and(
           eq(projects.id, input.id),
-          eq(projects.owner, ctx.session.userId),
+          eq(projects.owner, ctx.session.orgId ?? ctx.session.userId),
         ),
-        with: { client: true, expenses: true },
+        with: { customer: true, expenses: true },
       });
     }),
 
@@ -43,7 +38,12 @@ export const projectRouter = createTRPCRouter({
         .from(projects)
         .leftJoin(expenses, eq(expenses.projectId, projects.id))
         .groupBy(expenses.projectId, projects.budget)
-        .where(eq(expenses.projectId, input.id));
+        .where(
+          and(
+            eq(expenses.projectId, input.id),
+            eq(expenses.owner, ctx.session.orgId ?? ctx.session.userId),
+          ),
+        );
       return results[0];
     }),
 
@@ -51,9 +51,9 @@ export const projectRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        status: z.enum(statusEnum.enumValues),
+        status: z.enum(projectStatusEnum.enumValues),
         budget: z.string(),
-        clientId: z.string(),
+        customerId: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -61,13 +61,23 @@ export const projectRouter = createTRPCRouter({
         name: input.name,
         status: input.status,
         budget: input.budget,
-        clientId: parseInt(input.clientId),
-        owner: ctx.session.userId,
+        customerId: input.customerId,
+        createdBy: ctx.session.userId,
+        updatedBy: ctx.session.userId,
+        owner: ctx.session.orgId ?? ctx.session.userId,
       });
     }),
 
   update: protectedProcedure
-    .input(updateProjectSchema)
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        status: z.enum(projectStatusEnum.enumValues),
+        budget: z.string(),
+        customerId: z.number(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       if (!input.id)
         throw new TRPCError({
@@ -77,11 +87,16 @@ export const projectRouter = createTRPCRouter({
 
       await ctx.db
         .update(projects)
-        .set({ status: input.status })
+        .set({
+          name: input.name,
+          status: input.status,
+          budget: input.budget,
+          customerId: input.customerId,
+        })
         .where(
           and(
             eq(projects.id, input.id),
-            eq(projects.owner, ctx.session.userId),
+            eq(projects.owner, ctx.session.orgId ?? ctx.session.userId),
           ),
         );
     }),

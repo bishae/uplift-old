@@ -19,7 +19,7 @@ import {
 import { taskStatusEnum } from "@/server/db/schema";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type z } from "zod";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -33,13 +33,26 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { task } from "@/lib/validation";
 
-export default function CreateTaskForm({ projectId }: { projectId: number }) {
-  const form = useForm<z.infer<typeof task>>({
-    resolver: zodResolver(task),
+interface Props {
+  projectId: number;
+}
+
+const formSchema = z.object({
+  summery: z.string(),
+  description: z.string(),
+  status: z.enum(taskStatusEnum.enumValues),
+  projectId: z.number(),
+});
+
+type FormInput = z.infer<typeof formSchema>;
+
+export default function CreateTaskDialogForm({ projectId }: Props) {
+  const form = useForm<FormInput>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       summery: "",
+      description: "",
       status: "todo",
       projectId: projectId,
     },
@@ -51,7 +64,7 @@ export default function CreateTaskForm({ projectId }: { projectId: number }) {
     onSuccess: () => utils.task.all.invalidate(),
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof task>> = async (data) => {
+  const onSubmit: SubmitHandler<FormInput> = async (data) => {
     create.mutate(data);
     form.reset();
     toast({

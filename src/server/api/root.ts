@@ -1,9 +1,8 @@
-import { postRouter } from "@/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { projectRouter } from "./routers/project";
 import { taskRouter } from "./routers/task";
-import { clientRouter } from "./routers/client";
 import { expenseRouter } from "./routers/expense";
+import { customerRouter } from "./routers/customer";
 
 /**
  * This is the primary router for your server.
@@ -11,10 +10,9 @@ import { expenseRouter } from "./routers/expense";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
   project: projectRouter,
   task: taskRouter,
-  customer: clientRouter,
+  customer: customerRouter,
   expense: expenseRouter,
 });
 

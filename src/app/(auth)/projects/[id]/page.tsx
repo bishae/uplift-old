@@ -1,8 +1,8 @@
 "use client";
 
-import CreateTaskForm from "@/app/_components/create-task-form";
-import TaskCard from "@/app/_components/task-card";
+import BriefTaskCard from "@/components/brief-task-card";
 import CreateExpenseDialogForm from "@/components/create-expense-dialog-form";
+import CreateTaskDialogForm from "@/components/create-task-dialog-form";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -28,12 +28,14 @@ export default function Project({ params }: { params: { id: string } }) {
   const project = api.project.one.useQuery({ id: parseInt(params.id) });
   const expense = api.project.expense.useQuery({ id: parseInt(params.id) });
 
-  if (tasks.isLoading) return <p>Loading...</p>;
+  if (project.isLoading) return <p>Loading...</p>;
 
-  if (!tasks.data) return <p>No data...</p>;
+  if (!project.data) return <p>No data...</p>;
+
+  if (!tasks.data) return <p>Loading...</p>;
 
   return (
-    <>
+    <main>
       <div className="flex items-center justify-between space-y-2 px-8 py-4">
         {/* <h2 className="text-3xl tracking-tight">Gig: {project.data?.name}</h2> */}
         <Breadcrumb>
@@ -52,7 +54,7 @@ export default function Project({ params }: { params: { id: string } }) {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex items-center space-x-2">
-          <CreateTaskForm projectId={parseInt(params.id)} />
+          <CreateTaskDialogForm projectId={project.data?.id ?? 0} />
         </div>
       </div>
 
@@ -62,11 +64,11 @@ export default function Project({ params }: { params: { id: string } }) {
           <div className="flex flex-col gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>{project.data?.name}</CardTitle>
+                <CardTitle>{project.data.name}</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2">
                 <div className="text-sm text-muted-foreground">
-                  {project.data?.description}
+                  {project.data.description}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4" />
@@ -77,7 +79,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4" />
                   <span className="text-muted-foreground">
-                    Client: {project.data?.client?.name ?? "N/A"}
+                    Client: {project.data.customer.name ?? "n/a"}
                   </span>
                 </div>
               </CardContent>
@@ -89,25 +91,15 @@ export default function Project({ params }: { params: { id: string } }) {
               <CardContent className="grid gap-4">
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    {project.data?.budget ? (
-                      <>
-                        <span className="text-muted-foreground">
-                          Total Budget
-                        </span>
-                        <span>
-                          {Intl.NumberFormat("en-US", {
-                            currency: "USD",
-                            style: "currency",
-                          }).format(parseFloat(expense.data?.budget ?? "0.00"))}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-muted-foreground">No Budget</span>
-                    )}
+                    <span className="text-muted-foreground">Budget</span>
+                    <span>
+                      {Intl.NumberFormat("en-US", {
+                        currency: "USD",
+                        style: "currency",
+                      }).format(parseFloat(project.data.budget ?? "0.00"))}
+                    </span>
                   </div>
-                  {/* <Progress value={60} aria-label="60% of budget used" /> */}
                 </div>
-
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Expenses</span>
@@ -120,7 +112,6 @@ export default function Project({ params }: { params: { id: string } }) {
                       )}
                     </span>
                   </div>
-                  {/* <Progress value={60} aria-label="60% of budget used" /> */}
                 </div>
                 <Separator />
                 <div className="grid gap-2">
@@ -131,18 +122,19 @@ export default function Project({ params }: { params: { id: string } }) {
                         currency: "USD",
                         style: "currency",
                       }).format(
-                        parseFloat(expense.data?.budget ?? "0.00") -
+                        parseFloat(project.data?.budget ?? "0.00") -
                           parseFloat(expense.data?.total_expense ?? "0.00"),
                       )}
                     </span>
                   </div>
+
                   <Progress
-                    value={
-                      (parseFloat(expense.data?.total_expense ?? "0.00") /
-                        parseFloat(expense.data?.budget ?? "0.00")) *
-                      100
-                    }
-                    aria-label="40% of budget remaining"
+                    value={Math.abs(
+                      ((parseFloat(expense.data?.total_expense ?? "0.00") -
+                        parseFloat(project.data.budget ?? "0.00")) /
+                        parseFloat(project.data.budget ?? "0.00")) *
+                        100,
+                    )}
                   />
                 </div>
                 <CreateExpenseDialogForm projectId={parseInt(params.id)} />
@@ -162,7 +154,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 {tasks.data
                   .filter((e) => e.status === "todo")
                   .map((e) => (
-                    <TaskCard key={e.id} task={e} />
+                    <BriefTaskCard key={e.id} task={e} />
                   ))}
               </div>
             </div>
@@ -177,7 +169,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 {tasks.data
                   .filter((e) => e.status === "in_progress")
                   .map((e) => (
-                    <TaskCard key={e.id} task={e} />
+                    <BriefTaskCard key={e.id} task={e} />
                   ))}
               </div>
             </div>
@@ -192,13 +184,13 @@ export default function Project({ params }: { params: { id: string } }) {
                 {tasks.data
                   .filter((e) => e.status === "done")
                   .map((e) => (
-                    <TaskCard key={e.id} task={e} />
+                    <BriefTaskCard key={e.id} task={e} />
                   ))}
               </div>
             </div>
           </div>
         </main>
       </div>
-    </>
+    </main>
   );
 }

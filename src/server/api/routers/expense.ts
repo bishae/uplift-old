@@ -8,6 +8,11 @@ export const expenseRouter = createTRPCRouter({
       z.object({ note: z.string(), amount: z.string(), projectId: z.number() }),
     )
     .mutation(async ({ ctx, input }) => {
-      return await ctx.db.insert(expenses).values(input);
+      return await ctx.db.insert(expenses).values({
+        ...input,
+        createdBy: ctx.session.userId,
+        updatedBy: ctx.session.userId,
+        owner: ctx.session.orgId ?? ctx.session.userId,
+      });
     }),
 });

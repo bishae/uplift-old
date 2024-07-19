@@ -5,16 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { type selectProjectSchema } from "@/server/db/schema";
+import { type SelectProject } from "@/types";
 import { Calendar, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type z } from "zod";
 
 interface Props {
-  project: z.infer<typeof selectProjectSchema>;
+  project: SelectProject;
 }
 
-export default function ProjectCard({ project }: Props) {
+export default function BriefProjectCard({ project }: Props) {
   const router = useRouter();
 
   return (

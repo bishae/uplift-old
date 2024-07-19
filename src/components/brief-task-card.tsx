@@ -6,17 +6,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Calendar, Text, User } from "lucide-react";
-import TaskUpdateForm from "./task-update-form";
-import { type z } from "zod";
-import { type selectTaskSchema } from "@/server/db/schema";
+import { type SelectTask } from "@/types";
+import UpdateTaskUpdateDialogForm from "./update-task-dialog-form";
 
 interface Props {
-  task: z.infer<typeof selectTaskSchema>;
+  task: SelectTask;
 }
 
-export default function TaskCard({ task }: Props) {
+export default function BriefTaskCard({ task }: Props) {
   return (
-    <TaskUpdateForm id={task.id} _task={task}>
+    <UpdateTaskUpdateDialogForm task={task}>
       <Card className="transition-all hover:cursor-pointer hover:opacity-70">
         <CardHeader>
           <CardTitle className="w-64 truncate text-sm font-medium">
@@ -42,6 +41,6 @@ export default function TaskCard({ task }: Props) {
           </div>
         </CardContent>
       </Card>
-    </TaskUpdateForm>
+    </UpdateTaskUpdateDialogForm>
   );
 }
