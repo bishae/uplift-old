@@ -113,12 +113,12 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Active" />
+                      <SelectTrigger className="capitalize">
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {taskStatusEnum.enumValues.map((e) => (
-                          <SelectItem key={e} value={e}>
+                          <SelectItem key={e} value={e} className="capitalize">
                             {e.replace("_", " ")}
                           </SelectItem>
                         ))}

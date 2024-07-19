@@ -15,6 +15,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import UpdateProjectDialogForm from "@/components/update-project-dialog-form";
 import { api } from "@/trpc/react";
 import { Calendar, User } from "lucide-react";
 import Link from "next/link";
@@ -26,7 +27,6 @@ export default function Project({ params }: { params: { id: string } }) {
   });
 
   const project = api.project.one.useQuery({ id: parseInt(params.id) });
-  const expense = api.project.expense.useQuery({ id: parseInt(params.id) });
 
   if (project.isLoading) return <p>Loading...</p>;
 
@@ -37,17 +37,12 @@ export default function Project({ params }: { params: { id: string } }) {
   return (
     <main>
       <div className="flex items-center justify-between space-y-2 px-8 py-4">
-        {/* <h2 className="text-3xl tracking-tight">Gig: {project.data?.name}</h2> */}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbLink asChild>
               <Link href="/dashboard">Dashboard</Link>
             </BreadcrumbLink>
             <BreadcrumbSeparator />
-            {/* <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Projects</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator /> */}
             <BreadcrumbItem>
               <BreadcrumbPage>Gig</BreadcrumbPage>
             </BreadcrumbItem>
@@ -60,11 +55,15 @@ export default function Project({ params }: { params: { id: string } }) {
 
       <div className="flex min-h-screen flex-col bg-muted/40">
         <main className="grid flex-1 grid-cols-1 gap-4 p-4 sm:p-6 md:grid-cols-[minmax(200px,_1fr)_3fr]">
-          {/* <ProjectDetailedCard id={2} /> */}
           <div className="flex flex-col gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>{project.data.name}</CardTitle>
+                <CardTitle>
+                  <div className="flex items-center justify-between">
+                    <span>{project.data.name}</span>
+                    <UpdateProjectDialogForm project={project.data} />
+                  </div>
+                </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2">
                 <div className="text-sm text-muted-foreground">
@@ -79,7 +78,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4" />
                   <span className="text-muted-foreground">
-                    Client: {project.data.customer.name ?? "n/a"}
+                    Client: {project.data.customer?.name ?? "n/a"}
                   </span>
                 </div>
               </CardContent>
@@ -107,9 +106,7 @@ export default function Project({ params }: { params: { id: string } }) {
                       {Intl.NumberFormat("en-US", {
                         currency: "USD",
                         style: "currency",
-                      }).format(
-                        parseFloat(expense.data?.total_expense ?? "0.00"),
-                      )}
+                      }).format(parseFloat(project.data.expense ?? "0.00"))}
                     </span>
                   </div>
                 </div>
@@ -122,15 +119,15 @@ export default function Project({ params }: { params: { id: string } }) {
                         currency: "USD",
                         style: "currency",
                       }).format(
-                        parseFloat(project.data?.budget ?? "0.00") -
-                          parseFloat(expense.data?.total_expense ?? "0.00"),
+                        parseFloat(project.data.budget ?? "0.00") -
+                          parseFloat(project.data.expense ?? "0.00"),
                       )}
                     </span>
                   </div>
 
                   <Progress
                     value={Math.abs(
-                      ((parseFloat(expense.data?.total_expense ?? "0.00") -
+                      ((parseFloat(project.data.expense ?? "0.00") -
                         parseFloat(project.data.budget ?? "0.00")) /
                         parseFloat(project.data.budget ?? "0.00")) *
                         100,

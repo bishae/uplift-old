@@ -50,7 +50,7 @@ export default function CreateExpenseDialogForm({ projectId }: Props) {
   const utils = api.useUtils();
 
   const mutation = api.expense.create.useMutation({
-    onSuccess: () => utils.project.expense.invalidate(),
+    onSuccess: () => utils.project.one.invalidate(),
   });
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
