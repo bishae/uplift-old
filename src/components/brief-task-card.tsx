@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Calendar, Text } from "lucide-react";
+import { Calendar, DollarSign, Text } from "lucide-react";
 import { type SelectTask } from "@/types";
 import UpdateTaskUpdateDialogForm from "./update-task-dialog-form";
 
@@ -33,6 +33,15 @@ export default function BriefTaskCard({ task }: Props) {
               {Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
                 new Date(task.dueDate),
               )}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <DollarSign className="h-4 w-4" />
+            <span className="text-muted-foreground">
+              {Intl.NumberFormat("en-US", {
+                currency: "usd",
+                style: "currency",
+              }).format(parseFloat(task.cost))}
             </span>
           </div>
         </CardContent>

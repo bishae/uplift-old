@@ -1,7 +1,7 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { tasks, taskStatusEnum } from "@/server/db/schema";
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sum } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const taskRouter = createTRPCRouter({
@@ -34,6 +34,7 @@ export const taskRouter = createTRPCRouter({
         summery: z.string(),
         description: z.string(),
         status: z.enum(taskStatusEnum.enumValues),
+        cost: z.string(),
         dueDate: z.date(),
         projectId: z.number(),
       }),
@@ -43,6 +44,7 @@ export const taskRouter = createTRPCRouter({
         summery: input.summery,
         description: input.description,
         status: input.status,
+        cost: input.cost,
         dueDate: new Date(
           input.dueDate.getTime() +
             Math.abs(input.dueDate.getTimezoneOffset() * 60000),
@@ -60,6 +62,7 @@ export const taskRouter = createTRPCRouter({
         id: z.number(),
         summery: z.string(),
         status: z.enum(taskStatusEnum.enumValues),
+        cost: z.string(),
         dueDate: z.date(),
       }),
     )
@@ -74,6 +77,7 @@ export const taskRouter = createTRPCRouter({
         .set({
           summery: input.summery,
           status: input.status,
+          cost: input.cost,
           dueDate: new Date(
             input.dueDate.getTime() +
               Math.abs(input.dueDate.getTimezoneOffset() * 60000),
@@ -85,5 +89,25 @@ export const taskRouter = createTRPCRouter({
             eq(tasks.owner, ctx.session.orgId ?? ctx.session.userId),
           ),
         );
+    }),
+
+  cost: protectedProcedure
+    .input(z.object({ projectId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const results = await ctx.db
+        .select({
+          cost: sum(tasks.cost),
+        })
+        .from(tasks)
+        .where(
+          and(
+            eq(tasks.status, "done"),
+            eq(tasks.projectId, input.projectId),
+            eq(tasks.owner, ctx.session.orgId ?? ctx.session.userId),
+          ),
+        )
+        .groupBy(tasks.projectId);
+
+      return results[0];
     }),
 });

@@ -26,6 +26,8 @@ export default function Project({ params }: { params: { id: string } }) {
     limit: 10,
   });
 
+  const tasksCost = api.task.cost.useQuery({ projectId: parseInt(params.id) });
+
   const project = api.project.single.useQuery({ id: parseInt(params.id) });
 
   if (project.isLoading) return <p>Loading...</p>;
@@ -111,7 +113,10 @@ export default function Project({ params }: { params: { id: string } }) {
                       {Intl.NumberFormat("en-US", {
                         currency: "USD",
                         style: "currency",
-                      }).format(parseFloat(project.data.expense ?? "0.00"))}
+                      }).format(
+                        parseFloat(project.data.expense ?? "0.00") +
+                          parseFloat(tasksCost.data?.cost ?? "0.00"),
+                      )}
                     </span>
                   </div>
                 </div>
@@ -125,14 +130,16 @@ export default function Project({ params }: { params: { id: string } }) {
                         style: "currency",
                       }).format(
                         parseFloat(project.data.budget ?? "0.00") -
-                          parseFloat(project.data.expense ?? "0.00"),
+                          parseFloat(project.data.expense ?? "0.00") +
+                          parseFloat(tasksCost.data?.cost ?? "0.00"),
                       )}
                     </span>
                   </div>
 
                   <Progress
                     value={Math.abs(
-                      ((parseFloat(project.data.expense ?? "0.00") -
+                      ((parseFloat(project.data.expense ?? "0.00") +
+                        parseFloat(tasksCost.data?.cost ?? "0.00") -
                         parseFloat(project.data.budget ?? "0.00")) /
                         parseFloat(project.data.budget ?? "0.00")) *
                         100,

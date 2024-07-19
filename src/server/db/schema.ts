@@ -90,6 +90,7 @@ export const tasks = createTable("tasks", {
   description: text("description").notNull(),
   status: taskStatusEnum("status").notNull(),
   dueDate: date("due_date", { mode: "date" }).notNull(),
+  cost: numeric("cost", { precision: 10, scale: 2 }).notNull(),
   projectId: integer("project_id")
     .references(() => projects.id)
     .notNull(),

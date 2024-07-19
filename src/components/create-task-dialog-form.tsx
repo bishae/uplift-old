@@ -47,6 +47,7 @@ const formSchema = z.object({
   summery: z.string(),
   description: z.string(),
   status: z.enum(taskStatusEnum.enumValues),
+  cost: z.string(),
   dueDate: z.date(),
   projectId: z.number(),
 });
@@ -60,6 +61,7 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
       summery: "",
       description: "",
       status: "todo",
+      cost: "0.00",
       dueDate: new Date(),
       projectId: projectId,
     },
@@ -68,7 +70,10 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
   const utils = api.useUtils();
 
   const create = api.task.create.useMutation({
-    onSuccess: () => utils.task.many.invalidate(),
+    onSuccess: async () => {
+      await utils.task.many.invalidate();
+      await utils.task.cost.invalidate();
+    },
   });
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
@@ -134,6 +139,23 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
                   </FormControl>
                   <FormDescription>
                     Set it for the current status of the project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="cost"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cost</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is the display name of the project.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

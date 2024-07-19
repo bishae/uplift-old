@@ -50,6 +50,7 @@ const formSchema = z.object({
   id: z.number(),
   summery: z.string(),
   status: z.enum(taskStatusEnum.enumValues),
+  cost: z.string(),
   dueDate: z.date(),
   projectId: z.number(),
 });
@@ -63,6 +64,7 @@ export default function UpdateTaskUpdateDialogForm({ task, children }: Props) {
       id: task.id,
       summery: task.summery,
       status: task.status,
+      cost: task.cost,
       dueDate: new Date(task.dueDate),
       projectId: task.projectId,
     },
@@ -71,7 +73,10 @@ export default function UpdateTaskUpdateDialogForm({ task, children }: Props) {
   const utils = api.useUtils();
 
   const create = api.task.update.useMutation({
-    onSuccess: () => utils.task.many.invalidate(),
+    onSuccess: async () => {
+      await utils.task.many.invalidate();
+      await utils.task.cost.invalidate();
+    },
   });
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
@@ -137,6 +142,23 @@ export default function UpdateTaskUpdateDialogForm({ task, children }: Props) {
                   </FormControl>
                   <FormDescription>
                     Set it for the current status of the project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="cost"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cost</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is the display name of the project.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
