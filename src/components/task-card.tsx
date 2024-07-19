@@ -13,7 +13,7 @@ interface Props {
   task: SelectTask;
 }
 
-export default function BriefTaskCard({ task }: Props) {
+export default function TaskCard({ task }: Props) {
   return (
     <UpdateTaskUpdateDialogForm task={task}>
       <Card className="transition-all hover:cursor-pointer hover:opacity-70">
@@ -26,7 +26,6 @@ export default function BriefTaskCard({ task }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-2">
-          {/* <div className="text-sm font-medium">{title}</div> */}
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4" />
             <span className="text-muted-foreground">

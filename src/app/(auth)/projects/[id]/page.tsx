@@ -1,9 +1,9 @@
 "use client";
 
-import BriefTaskCard from "@/components/brief-task-card";
 import CreateExpenseDialogForm from "@/components/create-expense-dialog-form";
 import CreateTaskDialogForm from "@/components/create-task-dialog-form";
-import { Badge } from "@/components/ui/badge";
+import StatusContainer from "@/components/status-container";
+import TaskCard from "@/components/task-card";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import UpdateProjectDialogForm from "@/components/update-project-dialog-form";
+import { taskStatusEnum } from "@/server/db/schema";
 import { api } from "@/trpc/react";
 import { Calendar, User } from "lucide-react";
 import Link from "next/link";
@@ -29,12 +30,6 @@ export default function Project({ params }: { params: { id: string } }) {
   const tasksCost = api.task.cost.useQuery({ projectId: parseInt(params.id) });
 
   const project = api.project.single.useQuery({ id: parseInt(params.id) });
-
-  if (project.isLoading) return <p>Loading...</p>;
-
-  if (!project.data) return <p>No data...</p>;
-
-  if (!tasks.data) return <p>Loading...</p>;
 
   return (
     <main>
@@ -62,20 +57,22 @@ export default function Project({ params }: { params: { id: string } }) {
               <CardHeader>
                 <CardTitle>
                   <div className="flex items-center justify-between">
-                    <span>{project.data.name}</span>
-                    <UpdateProjectDialogForm project={project.data} />
+                    <span>{project.data?.name}</span>
+                    {project.data && (
+                      <UpdateProjectDialogForm project={project.data} />
+                    )}
                   </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2">
                 <div className="text-sm text-muted-foreground">
-                  {project.data.description}
+                  {project.data?.description}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4" />
                   <span className="text-muted-foreground">
                     Due Date:{" "}
-                    {project.data.dueDate
+                    {project.data?.dueDate
                       ? Intl.DateTimeFormat("en-US", {
                           dateStyle: "long",
                         }).format(new Date(project.data.dueDate))
@@ -85,7 +82,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4" />
                   <span className="text-muted-foreground">
-                    Client: {project.data.customer?.name ?? "n/a"}
+                    Client: {project.data?.customer?.name ?? "n/a"}
                   </span>
                 </div>
               </CardContent>
@@ -102,7 +99,7 @@ export default function Project({ params }: { params: { id: string } }) {
                       {Intl.NumberFormat("en-US", {
                         currency: "USD",
                         style: "currency",
-                      }).format(parseFloat(project.data.budget ?? "0.00"))}
+                      }).format(parseFloat(project.data?.budget ?? "0.00"))}
                     </span>
                   </div>
                 </div>
@@ -114,7 +111,7 @@ export default function Project({ params }: { params: { id: string } }) {
                         currency: "USD",
                         style: "currency",
                       }).format(
-                        parseFloat(project.data.expense ?? "0.00") +
+                        parseFloat(project.data?.expense ?? "0.00") +
                           parseFloat(tasksCost.data?.cost ?? "0.00"),
                       )}
                     </span>
@@ -129,8 +126,8 @@ export default function Project({ params }: { params: { id: string } }) {
                         currency: "USD",
                         style: "currency",
                       }).format(
-                        parseFloat(project.data.budget ?? "0.00") -
-                          parseFloat(project.data.expense ?? "0.00") +
+                        parseFloat(project.data?.budget ?? "0.00") -
+                          parseFloat(project.data?.expense ?? "0.00") +
                           parseFloat(tasksCost.data?.cost ?? "0.00"),
                       )}
                     </span>
@@ -138,10 +135,10 @@ export default function Project({ params }: { params: { id: string } }) {
 
                   <Progress
                     value={Math.abs(
-                      ((parseFloat(project.data.expense ?? "0.00") +
+                      ((parseFloat(project.data?.expense ?? "0.00") +
                         parseFloat(tasksCost.data?.cost ?? "0.00") -
-                        parseFloat(project.data.budget ?? "0.00")) /
-                        parseFloat(project.data.budget ?? "0.00")) *
+                        parseFloat(project.data?.budget ?? "0.00")) /
+                        parseFloat(project.data?.budget ?? "0.00")) *
                         100,
                     )}
                   />
@@ -152,51 +149,20 @@ export default function Project({ params }: { params: { id: string } }) {
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <div className="rounded-lg bg-background p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-medium">Todo</h3>
-                <Badge variant="outline">
-                  {tasks.data?.filter((e) => e.status === "todo").length}
-                </Badge>
-              </div>
-              <div className="grid gap-4">
+            {taskStatusEnum.enumValues.map((status) => (
+              <StatusContainer
+                key={status}
+                title={status}
+                count={
+                  tasks.data?.filter((task) => task.status === status).length ??
+                  0
+                }
+              >
                 {tasks.data
-                  .filter((e) => e.status === "todo")
-                  .map((e) => (
-                    <BriefTaskCard key={e.id} task={e} />
-                  ))}
-              </div>
-            </div>
-            <div className="rounded-lg bg-background p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-medium">In Porgress</h3>
-                <Badge variant="outline">
-                  {tasks.data?.filter((e) => e.status === "in_progress").length}
-                </Badge>
-              </div>
-              <div className="grid gap-4">
-                {tasks.data
-                  .filter((e) => e.status === "in_progress")
-                  .map((e) => (
-                    <BriefTaskCard key={e.id} task={e} />
-                  ))}
-              </div>
-            </div>
-            <div className="rounded-lg bg-background p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-medium">Done</h3>
-                <Badge variant="outline">
-                  {tasks.data?.filter((e) => e.status === "done").length}
-                </Badge>
-              </div>
-              <div className="grid gap-4">
-                {tasks.data
-                  .filter((e) => e.status === "done")
-                  .map((e) => (
-                    <BriefTaskCard key={e.id} task={e} />
-                  ))}
-              </div>
-            </div>
+                  ?.filter((task) => task.status === status)
+                  .map((task) => <TaskCard key={task.id} task={task} />)}
+              </StatusContainer>
+            ))}
           </div>
         </main>
       </div>
