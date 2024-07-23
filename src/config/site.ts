@@ -8,6 +8,6 @@ export const siteConfig: SiteConfig = {
   ogImage: "",
   links: {
     twitter: "https://www.linkedin.com/in/bytebisha/",
-    github: "https://github.com/obisha/uplift",
+    github: "https://github.com/biahe/uplift",
   },
 };
