@@ -9,9 +9,7 @@ import {
 import { useRouter } from "next/navigation";
 import type { SelectCustomer, SelectProject } from "@/types";
 
-type Project = {
-  customer: SelectCustomer;
-} & SelectProject;
+type Project = SelectProject & { customer?: SelectCustomer | null };
 
 interface Props {
   project: Project;
@@ -50,7 +48,7 @@ export default function ProjectCard({ project }: Props) {
         <div className="flex items-center gap-2 text-sm">
           <User className="h-4 w-4" />
           <span className="text-muted-foreground">
-            Client: {project.customer.name ?? "n/a"}
+            Client: {project.customer?.name ?? "n/a"}
           </span>
         </div>
       </CardContent>

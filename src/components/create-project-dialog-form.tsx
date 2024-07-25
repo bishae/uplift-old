@@ -37,14 +37,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PlusIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string(),
   status: z.enum(projectStatusEnum.enumValues),
   budget: z.string(),
   dueDate: z.date(),
-  customerId: z.coerce.number(),
+  customerId: z.coerce.number().optional(),
 });
 
 type FormInput = z.infer<typeof formSchema>;
@@ -59,29 +59,34 @@ export default function CreateProjectDialogForm() {
       status: "active",
       budget: "",
       dueDate: new Date(),
-      customerId: 0,
+      customerId: undefined,
     },
   });
 
   const utils = api.useUtils();
 
   const create = api.project.create.useMutation({
-    onSuccess: () => utils.project.many.invalidate(),
+    onSuccess: (e) => {
+      utils.project.many.invalidate();
+      toast({
+        title: "Success",
+        description: `New project has been added`,
+        color: "green",
+      });
+    },
   });
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     create.mutate(data);
     form.reset();
-    toast({
-      title: "Success",
-      description: `New project has been added and is currently ${data.status} project`,
-    });
   };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Start a new project</Button>
+        <Button size="sm" className="uppercase">
+          <PlusIcon className="mr-2 h-4 w-4" /> Project
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -210,7 +215,7 @@ export default function CreateProjectDialogForm() {
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value.toString()}
+                        defaultValue={field.value?.toString() ?? ""}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -234,9 +239,12 @@ export default function CreateProjectDialogForm() {
             </div>
 
             <DialogFooter>
-              {/* <DialogTrigger asChild> */}
-              <Button type="submit">Submit</Button>
-              {/* </DialogTrigger> */}
+              <DialogTrigger asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogTrigger>
+              <DialogTrigger asChild>
+                <Button type="submit">Save</Button>
+              </DialogTrigger>
             </DialogFooter>
           </form>
         </Form>

@@ -36,7 +36,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PlusIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 
 interface Props {
@@ -88,7 +88,10 @@ export default function CreateTaskDialogForm({ projectId }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm">New Task</Button>
+        <Button size="sm">
+          <PlusIcon className="mr-2 h-4 w-4" />
+          Task
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

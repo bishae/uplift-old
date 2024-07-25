@@ -46,7 +46,9 @@ export default function Project({ params }: { params: { id: string } }) {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex items-center space-x-2">
-          <CreateTaskDialogForm projectId={project.data?.id ?? 0} />
+          {project.data?.id && (
+            <CreateTaskDialogForm projectId={project.data.id} />
+          )}
         </div>
       </div>
 

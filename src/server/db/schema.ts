@@ -56,9 +56,7 @@ export const projects = createTable("projects", {
   status: projectStatusEnum("status").default("active").notNull(),
   budget: numeric("budget", { precision: 10, scale: 2 }).notNull(),
   dueDate: date("due_date", { mode: "date" }).notNull(),
-  customerId: integer("customer_id")
-    .references(() => customers.id)
-    .notNull(),
+  customerId: integer("customer_id").references(() => customers.id),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

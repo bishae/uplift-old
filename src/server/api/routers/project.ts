@@ -49,19 +49,16 @@ export const projectRouter = createTRPCRouter({
         status: z.enum(projectStatusEnum.enumValues),
         budget: z.string(),
         dueDate: z.date(),
-        customerId: z.number(),
+        customerId: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.insert(projects).values({
-        name: input.name,
-        status: input.status,
-        budget: input.budget,
+        ...input,
         dueDate: new Date(
           input.dueDate.getTime() +
             Math.abs(input.dueDate.getTimezoneOffset() * 60000),
         ),
-        customerId: input.customerId,
         createdBy: ctx.session.userId,
         updatedBy: ctx.session.userId,
         owner: ctx.session.orgId ?? ctx.session.userId,
@@ -76,7 +73,7 @@ export const projectRouter = createTRPCRouter({
         status: z.enum(projectStatusEnum.enumValues),
         budget: z.string(),
         dueDate: z.date(),
-        customerId: z.number(),
+        customerId: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -89,14 +86,11 @@ export const projectRouter = createTRPCRouter({
       await ctx.db
         .update(projects)
         .set({
-          name: input.name,
-          status: input.status,
-          budget: input.budget,
+          ...input,
           dueDate: new Date(
             input.dueDate.getTime() +
               Math.abs(input.dueDate.getTimezoneOffset() * 60000),
           ),
-          customerId: input.customerId,
         })
         .where(
           and(

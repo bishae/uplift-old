@@ -11,7 +11,9 @@ export default function StatusContainer({ children, title, count }: Props) {
   return (
     <div className="rounded-lg bg-background p-4">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-medium">{title}</h3>
+        <h3 className="text-lg font-medium capitalize">
+          {title.replace("_", " ")}
+        </h3>
         <Badge variant="outline">{count}</Badge>
       </div>
       <div className="grid gap-4">{children}</div>
